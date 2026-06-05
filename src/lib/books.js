@@ -7,12 +7,20 @@ export async function uploadBookFile(file) {
   const ext = file.name.split('.').pop()
   const path = `${user.id}/${Date.now()}.${ext}`
 
-  const { error } = await supabase.storage
+  console.log('Uploading to path:', path)
+
+  const { data: uploadData, error: uploadError } = await supabase.storage
     .from('books')
     .upload(path, file, { upsert: false })
-  if (error) throw error
+  
+  console.log('Upload result:', uploadData, uploadError)
+
+  if (uploadError) throw uploadError
 
   const { data } = supabase.storage.from('books').getPublicUrl(path)
+  
+  console.log('Public URL:', data.publicUrl)
+  
   return { path, url: data.publicUrl }
 }
 
