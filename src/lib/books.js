@@ -46,7 +46,7 @@ export async function getGenres() {
 // ─── Google Drive ─────────────────────────────────────────────────────────
 
 export const getGDriveViewUrl     = id => `https://drive.google.com/file/d/${id}/view`
-export const getGDriveEmbedUrl    = id => `https://drive.google.com/file/d/${id}/preview`
+export const getGDriveEmbedUrl = id => `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${id}&embedded=true`
 export const getGDriveDownloadUrl = id => `https://drive.google.com/uc?export=download&id=${id}`
 
 // ─── Cover ────────────────────────────────────────────────────────────────
