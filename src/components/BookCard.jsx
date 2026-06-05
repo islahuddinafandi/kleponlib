@@ -42,7 +42,7 @@ export default function BookCard({ book, onRead, onDelete }) {
 
       {/* Actions */}
       <div className={styles.actions}>
-        {book.gdrive_file_id && (
+        {book.file_url && (
           <button className={styles.readBtn} onClick={onRead}>
             📖 Baca
           </button>
