@@ -1,10 +1,12 @@
-import { getGDriveEmbedUrl, getGDriveDownloadUrl, getGDriveViewUrl } from '../lib/books'
+import { getGDriveDownloadUrl, getGDriveViewUrl } from '../lib/books'
 import styles from './Modal.module.css'
 
 export default function ReaderModal({ book, onClose }) {
-  const embedUrl = getGDriveEmbedUrl(book.gdrive_file_id)
   const downloadUrl = getGDriveDownloadUrl(book.gdrive_file_id)
   const viewUrl = getGDriveViewUrl(book.gdrive_file_id)
+  
+  // PDF.js viewer via CDN - render langsung di browser
+  const pdfJsUrl = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(downloadUrl)}`
 
   return (
     <div className={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -26,9 +28,8 @@ export default function ReaderModal({ book, onClose }) {
         </div>
         <iframe
           className={styles.readerFrame}
-          src={embedUrl}
+          src={pdfJsUrl}
           title={book.title}
-          allow="autoplay"
         />
       </div>
     </div>
