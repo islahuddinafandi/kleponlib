@@ -1,5 +1,21 @@
 import { supabase } from './supabase'
 
+// ─── Upload PDF ke Supabase Storage ───────────────────────────────────────
+
+export async function uploadBookFile(file) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const ext = file.name.split('.').pop()
+  const path = `${user.id}/${Date.now()}.${ext}`
+
+  const { error } = await supabase.storage
+    .from('books')
+    .upload(path, file, { upsert: false })
+  if (error) throw error
+
+  const { data } = supabase.storage.from('books').getPublicUrl(path)
+  return { path, url: data.publicUrl }
+}
+
 // ─── Supabase: Metadata Buku ───────────────────────────────────────────────
 
 export async function getBooks({ search = '', genre = '', sort = 'created_at' } = {}) {
@@ -8,12 +24,8 @@ export async function getBooks({ search = '', genre = '', sort = 'created_at' } 
     .select('*')
     .order(sort, { ascending: sort === 'title' || sort === 'author' })
 
-  if (search) {
-    query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%`)
-  }
-  if (genre) {
-    query = query.eq('genre', genre)
-  }
+  if (search) query = query.or(`title.ilike.%${search}%,author.ilike.%${search}%`)
+  if (genre)  query = query.eq('genre', genre)
 
   const { data, error } = await query
   if (error) throw error
@@ -39,15 +51,8 @@ export async function deleteBook(id) {
 export async function getGenres() {
   const { data, error } = await supabase.from('books').select('genre')
   if (error) throw error
-  const genres = [...new Set(data.map(b => b.genre).filter(Boolean))]
-  return genres.sort()
+  return [...new Set(data.map(b => b.genre).filter(Boolean))].sort()
 }
-
-// ─── Google Drive ─────────────────────────────────────────────────────────
-
-export const getGDriveViewUrl     = id => `https://drive.google.com/file/d/${id}/view`
-export const getGDriveEmbedUrl = id => `https://docs.google.com/viewer?url=https://drive.google.com/uc?id=${id}&embedded=true`
-export const getGDriveDownloadUrl = id => `https://drive.google.com/uc?export=download&id=${id}`
 
 // ─── Cover ────────────────────────────────────────────────────────────────
 
